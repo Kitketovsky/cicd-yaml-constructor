@@ -1,11 +1,11 @@
 <script lang="ts">
-	export let yaml: JSON;
+	import { root } from "../../stores/tree";
 </script>
 
-{#if yaml}
+{#if $root}
 	<div class="yaml">
 		<pre>
-			{JSON.stringify(yaml, null, 2).trim()}
+			{JSON.stringify($root, null, 2).trim()}
 		</pre>
 	</div>
 {/if}
