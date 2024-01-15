@@ -25,8 +25,4 @@
 	ul {
 		list-style-type: "- ";
 	}
-
-	li {
-		border: 1px solid black;
-	}
 </style>

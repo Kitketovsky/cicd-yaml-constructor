@@ -6,23 +6,19 @@
 
 	export let data;
 
-	$: root.set(data.jsonYaml);
-
-	$: nodesData = $root
-		? Object.keys($root).map((key, index) => {
-				return {
-					id: crypto.randomUUID(),
-					position: { x: 0, y: 200 * index },
-					key
-				};
-			})
-		: [];
+	$: {
+		root.set(data.jsonYaml);
+	}
 </script>
 
 <Svelvet id="my-canvas" controls fitView TD>
-	{#each nodesData as nodeData (nodeData.id)}
-		<YamlNode {nodeData} />
-	{/each}
+	{#if $root}
+		{#each Object.keys($root).map((key, index) => {
+			return { id: index, position: { x: 0, y: 200 * index }, key };
+		}) as nodeData (nodeData.id)}
+			<YamlNode {nodeData} />
+		{/each}
+	{/if}
 </Svelvet>
 
 <YamlView />

@@ -4,7 +4,7 @@
 	import YamlObject from "./YamlObject.svelte";
 	import { root } from "../../stores/tree";
 
-	export let nodeData: { id: string; position: { x: number; y: number }; key: string };
+	export let nodeData: { id: string | number; position: { x: number; y: number }; key: string };
 </script>
 
 {#if $root}
