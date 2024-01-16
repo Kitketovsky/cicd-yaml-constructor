@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { root } from "../../stores/tree";
+	import { root } from "../../stores/stores";
 </script>
 
 {#if $root}

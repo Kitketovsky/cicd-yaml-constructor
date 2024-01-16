@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { root } from "../../stores/tree";
+	import { root } from "../../stores/stores";
 	import YamlArray from "./YamlArray.svelte";
 
 	export let data: Record<string, any>;
-	export let keys: (string | number)[];
+	export let keys: string[];
 
 	$: entries = Object.entries(data);
 
@@ -31,6 +31,8 @@
 					for (let object_key of Object.keys(data)) {
 						const old_value = Object.getOwnPropertyDescriptor(data, object_key);
 
+						if (!old_value) return null;
+
 						const new_key = event.currentTarget.value;
 
 						Object.defineProperty(
@@ -42,6 +44,8 @@
 
 					let ref = getObjectRef($root, keys.slice(0, keys.length - 1));
 					let refKey = keys.at(-1);
+
+					if (!refKey) return null;
 
 					ref[refKey] = sortedObject;
 					$root = $root;

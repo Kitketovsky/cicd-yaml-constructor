@@ -2,26 +2,49 @@
 	import { Node, Anchor } from "svelvet";
 	import YamlArray from "./YamlArray.svelte";
 	import YamlObject from "./YamlObject.svelte";
-	import { root } from "../../stores/tree";
+	import { root, nodes } from "../../stores/stores";
 
 	export let nodeData: { id: string | number; position: { x: number; y: number }; key: string };
+	export let index: number;
+
+	let nodePosition;
+
+	// let wrapper: HTMLDivElement;
+
+	// $: if (wrapper) {
+	// 	console.log(wrapper.getBoundingClientRect());
+	// }
 </script>
 
+<!-- props: position, connections [nodeId, anchorId] | nodeId -->
+
 {#if $root}
-	<Node useDefaults position={nodeData.position}>
-		<div class="node-wrapper">
+	{@const data = $root[nodeData.key]}
+
+	<Node useDefaults let:node let:grabHandle position={nodeData.position} id={nodeData.id}>
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<div
+			class="node-wrapper"
+			use:grabHandle
+			on:mouseup={() => {
+				const { position } = node;
+				nodePosition = position;
+				// @ts-ignore
+				$nodes[index].position = $nodePosition;
+			}}
+		>
 			<div class="input-anchors">
 				<Anchor direction="north" />
 			</div>
 
 			<span>Node: {nodeData.key}</span>
 
-			{#if Array.isArray($root[nodeData.key])}
-				<YamlArray keys={[nodeData.key]} data={$root[nodeData.key]} />
-			{:else if $root[nodeData.key] && typeof $root[nodeData.key] === "object"}
-				<YamlObject keys={[nodeData.key]} data={$root[nodeData.key]} />
+			{#if Array.isArray(data)}
+				<YamlArray keys={[nodeData.key]} {data} />
+			{:else if data && typeof data === "object"}
+				<YamlObject keys={[nodeData.key]} {data} />
 			{:else}
-				{$root[nodeData.key]}
+				{data}
 			{/if}
 
 			<div class="output-anchors">
