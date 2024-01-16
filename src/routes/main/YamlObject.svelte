@@ -5,19 +5,48 @@
 	export let data: Record<string, any>;
 	export let keys: (string | number)[];
 
-	const entries = Object.entries(data);
+	$: entries = Object.entries(data);
+
+	function getObjectRef(object: Record<string, any>, keys: string[]) {
+		let ref = object;
+
+		for (let key of keys) {
+			ref = ref[key];
+		}
+
+		return ref;
+	}
 </script>
 
-<!-- if (old_key !== new_key) {
-    Object.defineProperty(o, new_key,
-        Object.getOwnPropertyDescriptor(o, old_key));
-    delete o[old_key];
-} -->
-
 <ul>
-	{#each entries as [key, value], index (index)}
+	<span>YamlObject</span>
+
+	{#each entries as [key, value]}
 		<li>
-			{key}: {#if Array.isArray(value)}
+			<input
+				value={key}
+				on:input={(event) => {
+					let sortedObject = {};
+
+					for (let object_key of Object.keys(data)) {
+						const old_value = Object.getOwnPropertyDescriptor(data, object_key);
+
+						const new_key = event.currentTarget.value;
+
+						Object.defineProperty(
+							sortedObject,
+							object_key === key ? new_key : object_key,
+							old_value
+						);
+					}
+
+					let ref = getObjectRef($root, keys.slice(0, keys.length - 1));
+					let refKey = keys.at(-1);
+
+					ref[refKey] = sortedObject;
+					$root = $root;
+				}}
+			/>: {#if Array.isArray(value)}
 				<YamlArray keys={[...keys, key]} data={value} />
 			{:else if value && typeof value === "object"}
 				<svelte:self keys={[...keys, key]} data={value} />
@@ -26,7 +55,9 @@
 					type="text"
 					{value}
 					on:input={(event) => {
-						$root["build-job"]["image"] = event.currentTarget.value;
+						let ref = getObjectRef($root, keys);
+						ref[key] = event.currentTarget.value;
+						$root = $root;
 					}}
 				/>
 			{/if}
@@ -37,5 +68,15 @@
 <style>
 	ul {
 		list-style-type: none;
+		border: 1px solid black;
+		margin: 0.5rem;
+		padding: 0.5rem;
+	}
+
+	span {
+		display: block;
+		font-size: 0.7rem;
+		margin-bottom: 0.5rem;
+		text-decoration: underline;
 	}
 </style>

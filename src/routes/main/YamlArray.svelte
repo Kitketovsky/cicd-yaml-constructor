@@ -10,6 +10,9 @@
 </script>
 
 <ul>
+	<span>YamlArray</span>
+	<!-- <div class="keys">{["root", ...keys].join(".")}</div> -->
+
 	{#each data as value, index ([...keys, index].join("."))}
 		{#if Array.isArray(value)}
 			<svelte:self data={value} />
@@ -23,6 +26,18 @@
 
 <style>
 	ul {
+		/* position: relative; */
 		list-style-type: "- ";
+		border: 1px solid red;
+		margin: 0.5rem;
+		padding: 0.5rem;
+	}
+
+	span {
+		display: block;
+		font-size: 0.7rem;
+		margin-bottom: 0.5rem;
+		text-decoration: underline;
+		color: red;
 	}
 </style>

@@ -8,13 +8,13 @@
 </script>
 
 {#if $root}
-	<Node useDefaults position={nodeData.position} on:nodeReleased={console.log}>
+	<Node useDefaults position={nodeData.position}>
 		<div class="node-wrapper">
 			<div class="input-anchors">
 				<Anchor direction="north" />
 			</div>
 
-			<span>{nodeData.key}</span>
+			<span>Node: {nodeData.key}</span>
 
 			{#if Array.isArray($root[nodeData.key])}
 				<YamlArray keys={[nodeData.key]} data={$root[nodeData.key]} />
