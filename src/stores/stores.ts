@@ -5,3 +5,5 @@ import { writable } from "svelte/store";
 export const root = writable<Record<string, string | number | object | Array<string | number | object>>>({});
 
 export const nodes = writable<{ id: string, key: string, position: { x: number, y: number }}[]>([]);
+
+export const hovered = writable<string | null>(null);

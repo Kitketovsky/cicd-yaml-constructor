@@ -3,7 +3,7 @@
 	import YamlArray from "./YamlArray.svelte";
 	import YamlObject from "./YamlObject.svelte";
 	import { root, nodes } from "../../stores/stores";
-	import { createEventDispatcher, onMount, tick } from "svelte";
+	import { createEventDispatcher, getContext, onMount, tick } from "svelte";
 
 	export let nodeData: {
 		id: string | number;
@@ -12,12 +12,10 @@
 
 	export let index: number;
 
-	const dispatch = createEventDispatcher<{ save: undefined }>();
-
 	$: connections = $nodes[index + 1]?.id ? [$nodes[index + 1]?.id] : [];
 
-	let width: number;
-	let height: number;
+	// let width: number;
+	// let height: number;
 
 	// onMount(() => {
 	// 	if (!width && !height) {
@@ -33,13 +31,7 @@
 <Node useDefaults let:grabHandle id={nodeData.id} bind:position={$nodes[index].position}>
 	{@const data = $root[nodeData.key]}
 
-	<div
-		class="node-wrapper"
-		use:grabHandle
-		on:mouseup={(event) => {
-			dispatch("save");
-		}}
-	>
+	<div class="node-wrapper" use:grabHandle>
 		<!-- only for input -->
 		<div class="input-anchors">
 			<Anchor direction="north" input />

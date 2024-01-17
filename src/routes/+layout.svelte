@@ -8,6 +8,13 @@
 			<a href="/">Login</a>
 			<a href="/main">Dashboard</a>
 		</nav>
+
+		<button
+			on:click={() => {
+				localStorage.removeItem("CONSTRUCTOR");
+				localStorage.removeItem("CONSTRUCTOR-NODES");
+			}}>Clear storage</button
+		>
 	</header>
 
 	<main>
@@ -27,11 +34,10 @@
 	}
 
 	header {
-		padding: 1rem 0;
-	}
-
-	footer {
-		padding: 1rem 0;
+		padding: 1rem;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
 	}
 
 	main {
