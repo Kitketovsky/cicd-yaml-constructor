@@ -3,56 +3,64 @@
 	import YamlArray from "./YamlArray.svelte";
 	import YamlObject from "./YamlObject.svelte";
 	import { root, nodes } from "../../stores/stores";
+	import { createEventDispatcher, onMount, tick } from "svelte";
 
-	export let nodeData: { id: string | number; position: { x: number; y: number }; key: string };
+	export let nodeData: {
+		id: string | number;
+		key: string;
+	};
+
 	export let index: number;
 
-	let nodePosition;
+	const dispatch = createEventDispatcher<{ save: undefined }>();
 
-	// let wrapper: HTMLDivElement;
+	$: connections = $nodes[index + 1]?.id ? [$nodes[index + 1]?.id] : [];
 
-	// $: if (wrapper) {
-	// 	console.log(wrapper.getBoundingClientRect());
-	// }
+	let width: number;
+	let height: number;
+
+	// onMount(() => {
+	// 	if (!width && !height) {
+	// 		tick().then(() => {
+	// 			$nodes[index].position = { x: 0, y: height * index };
+	// 		});
+	// 	}
+	// });
 </script>
 
 <!-- props: position, connections [nodeId, anchorId] | nodeId -->
 
-{#if $root}
+<Node useDefaults let:grabHandle id={nodeData.id} bind:position={$nodes[index].position}>
 	{@const data = $root[nodeData.key]}
 
-	<Node useDefaults let:node let:grabHandle position={nodeData.position} id={nodeData.id}>
-		<!-- svelte-ignore a11y-no-static-element-interactions -->
-		<div
-			class="node-wrapper"
-			use:grabHandle
-			on:mouseup={() => {
-				const { position } = node;
-				nodePosition = position;
-				// @ts-ignore
-				$nodes[index].position = $nodePosition;
-			}}
-		>
-			<div class="input-anchors">
-				<Anchor direction="north" />
-			</div>
-
-			<span>Node: {nodeData.key}</span>
-
-			{#if Array.isArray(data)}
-				<YamlArray keys={[nodeData.key]} {data} />
-			{:else if data && typeof data === "object"}
-				<YamlObject keys={[nodeData.key]} {data} />
-			{:else}
-				{data}
-			{/if}
-
-			<div class="output-anchors">
-				<Anchor direction="south" />
-			</div>
+	<div
+		class="node-wrapper"
+		use:grabHandle
+		on:mouseup={(event) => {
+			dispatch("save");
+		}}
+	>
+		<!-- only for input -->
+		<div class="input-anchors">
+			<Anchor direction="north" input />
 		</div>
-	</Node>
-{/if}
+
+		<span>Node: {nodeData.key}</span>
+
+		{#if Array.isArray(data)}
+			<YamlArray keys={[nodeData.key]} {data} />
+		{:else if data && typeof data === "object"}
+			<YamlObject keys={[nodeData.key]} {data} />
+		{:else}
+			{data}
+		{/if}
+
+		<!-- only for outputs -->
+		<div class="output-anchors">
+			<Anchor direction="south" {connections} output />
+		</div>
+	</div>
+</Node>
 
 <style>
 	.node-wrapper {
