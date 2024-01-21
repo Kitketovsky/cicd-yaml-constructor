@@ -48,57 +48,89 @@
 	}
 
 	let editable = false;
-
-	let wrapper: HTMLUListElement;
-
-	function focusHandler(
-		event: MouseEvent & {
-			currentTarget: EventTarget & Window;
-		}
-	) {
-		if (event.target) {
-			editable = wrapper.contains(event.target as Node);
-		}
-	}
 </script>
 
 <!-- TODO: find another way to check if focus is within element or not -->
-<svelte:window on:click={focusHandler} />
-
-<ul bind:this={wrapper}>
-	{#each entries as [key, value]}
-		<li>
-			{#if editable}
-				<input value={key} on:input={(event) => onObjectKeyChange(event, key)} />
-			{:else}
-				<span>{key}</span>
-			{/if}
-			: {#if typeof value === "string" || typeof value === "number"}
+<div class="container">
+	<ul>
+		<button class="editButton" on:click={() => (editable = !editable)}>Edit</button>
+		{#each entries as [key, value]}
+			<li>
 				{#if editable}
-					<input type="text" {value} on:input={(event) => onObjectValueChange(event, key)} />
+					<input value={key} on:input={(event) => onObjectKeyChange(event, key)} />
 				{:else}
-					<span>{value}</span>
+					<span>{key}</span>
 				{/if}
+				: {#if typeof value === "string" || typeof value === "number"}
+					{#if editable}
+						<input type="text" {value} on:input={(event) => onObjectValueChange(event, key)} />
+					{:else}
+						<span>{value}</span>
+					{/if}
+				{/if}
+			</li>
+			{#if Array.isArray(value)}
+				<YamlArray keys={[...keys, key]} data={value} />
+			{:else if value && typeof value === "object"}
+				<svelte:self keys={[...keys, key]} data={value} />
 			{/if}
-		</li>
-		{#if Array.isArray(value)}
-			<YamlArray keys={[...keys, key]} data={value} />
-		{:else if value && typeof value === "object"}
-			<svelte:self keys={[...keys, key]} data={value} />
-		{/if}
-	{/each}
-</ul>
+		{/each}
+
+		<!-- in object we can add a key and a value, which can be -->
+		<!-- - another object
+			 - string
+			 - number
+			 - array
+		-->
+		<button class="addNewValue">+ Add New Key/Value Pair</button>
+	</ul>
+</div>
 
 <style>
+	.container {
+		--padding: 0.5rem;
+		--borderColor: black;
+		display: contents;
+	}
+
 	ul {
 		list-style-type: none;
-		border: 1px solid black;
+		border: 1px solid var(--borderColor);
 		margin: 0.5rem;
-		padding: 0.5rem;
+		padding: var(--padding);
 		background-color: white;
+		position: relative;
+	}
+
+	@supports selector(:has(*)) {
+		.addNewValue {
+			display: none;
+		}
+		ul:not(:has(ul:hover)):hover {
+			border: 3px solid var(--borderColor);
+		}
+
+		ul:not(:has(ul:hover)):hover > .addNewValue {
+			display: block;
+		}
+
+		.editButton {
+			display: none;
+		}
+
+		ul:not(:has(ul:hover)):hover > .editButton {
+			display: block;
+			position: absolute;
+			top: calc(var(--padding) * -1);
+			right: 0;
+		}
 	}
 
 	li {
 		padding: 0.5rem;
+	}
+
+	button {
+		margin-top: 0.5rem;
 	}
 </style>
